@@ -103,9 +103,10 @@ def main():
         temp_file = open(filename, 'r')
         for line in temp_file:
             if '--**--**--' in line:
-                idx = line.find(',')
-                idx2 = line.find('--**--**--') - 1
-                since_ids.append(line[11:idx] + ' ' + line[idx+13:idx2])
+                ln = line[11:]
+                idx = ln.find(',')
+                idx2 = ln[idx:].find('--**--**--') - 1
+                since_ids.append(ln[:idx] + ' ' + ln[idx+13:idx2])
         temp_file.close()
         files.append(open(filename, 'a'))
 
