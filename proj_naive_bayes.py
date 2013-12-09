@@ -1,160 +1,215 @@
-from __future__ import division
+#!/usr/bin/env python
+# -*- coding: utf-8  -*-
+#encoding=utf-8
+
+import tweepy
+import time
 import re
-import json
 import math
-import random
-import operator
+import sys
+from random import randint
 
-def read_data(filename):
-    """
-    purpose: read all tweets from the json file.
-    parameter: 
-        filename - the path of json file in your local computer 
-    return: a list containing all raw tweets each of which has the data structure of dictionary
-    """
-    data = []
-    try:
-        with open(filename) as f:
-            for line in f:
-                data.append(json.loads((line.strip()).encode('utf-8')))
-    except:
-        print "Failed to read data!"
-        return []
-    print "The json file has been successfully read!"
-    return data
+class TwitterCrawler():
+    # Fill in the blanks here for your own Twitter app.
+    consumer_key = ""
+    consumer_secret = ""
+    access_key = ""
+    access_secret = ""
+    auth = None
+    api = None
 
-def read_data2(filename):
-    """
-    Used to read all tweets from the text file.
-    """
-    data2 = []
-    try:
-        with open(filename) as f:
-            for line in f:
-                http_index = line.find('http') - 1
-                temp = (line.strip()).encode('utf-8')
-                if (http_index > -2):
-                    temp = temp[:http_index]
-                dic = dict(date = temp[:24], text = temp[25:])
-                print dic
-                data2.append(dic)
-    except:
-        print "Failed to read data!"
-        return []
-    print "The text file has been successfully read!"
-    return data2
-
-class Naive_Bayes():
     def __init__(self):
-        # all the training data from the 8 classes
-        self.training_data = []
-        # all the test data, one for each city
-        self.test_data = []
-        # tf (dict of dict indexed by tweet id)
-        self.term_freq = {}
-        # idf (dict indexed by term)
-        self.inverted_doc_freq = {}
-        # probabilities (dict indexed by term)
-        self.probabilities = []
-        # tf-idf (dict of dict indexed by tweet id)
-        self.tf_idf = {}
-        # used to store the frequency of documents (dict indexed by term)
-        self.freq_docs = {}
-        # you might need this which is used to store all terms/tokens in out documents
-        self.word_list = []
-        # write file descriptors
-        self.fdWrite = []
-        # number of tweets/docs in each training set
-        self.indiv_trng_docs = []
+        self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
+        self.auth.set_access_token(self.access_key, self.access_secret)
+        self.api = tweepy.API(self.auth, parser=tweepy.parsers.JSONParser())
+        # print self.api.rate_limit_status()
 
-    def DoNB(self):
-        random.seed()
-        total_trng_docs = 0
+    def re_init(self):
+        self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
+        self.auth.set_access_token(self.access_key, self.access_secret)
+        self.api = tweepy.API(self.auth, parser=tweepy.parsers.JSONParser())
 
-        trngFiles = ['dallas_crime_homicide.json','dallas_crime_finance.json','dallas_crime_sex.json',
-            'dallas_crime_drugs.json','dallas_crime_gen.json','dallas_accident.json','dallas_misc.json']
-	# 'dallas_disaster.json',
-        inFiles = ['houston_tweets.txt']
-        outFiles = []
-        for trngf in trngFiles:
-            self.training_data.append(read_data(trngf))
-        for inf in inFiles:
-            self.test_data.append(read_data2(inf))
-        print self.test_data[0][:10]
+    def check_api_rate_limit(self, sleep_time):
+        try:
+            rate_limit_status = self.api.rate_limit_status()
+        except Exception as error_message:
+            if error_message['code'] == 88:
+                print "Sleeping for %d seconds." %(sleep_time)
+                print rate_limit_status['resources']['statuses']
+                time.sleep(sleep_time)
 
-        for no, td in self.training_data:
-            self.probabilities[no] = {}
-            self.indiv_trng_docs[no] = len(td)
-            total_trng_docs += self.indiv_trng_docs[no]
-            for line, doc in enumerate(td):
-                # initialize each term freq and tf_idf vector
-                self.term_freq[line] = {}
-                self.tf_idf[line] = {}
+        while rate_limit_status['resources']['statuses']['/statuses/user_timeline']['remaining'] < 10:
+            print "Sleeping for %d seconds." %(sleep_time)
+            print rate_limit_status['resources']['statuses']
+            time.sleep(sleep_time)
+            rate_limit_status = self.api.rate_limit_status()
+        print rate_limit_status['resources']['statuses']['/statuses/user_timeline']
 
-                tokens = doc['text'].split() # tokenize each document
-                # for each token/term in that document
-                for token in tokens:
-                    # first add to word list
-                    if token not in self.word_list:
-                        self.word_list.append(token)
-                    if token not in self.freq_docs.keys():
-                        self.freq_docs[token] = []
-                    if token not in self.houston_inverted_doc_freq.keys():
-                        self.inverted_doc_freq[token] = 0
-                    if token not in self.term_freq[line].keys():
-                        self.term_freq[line][token] = 0
+    def crawl_user_profile(self, user_id):
+        self.check_api_rate_limit(900)
+        try:
+            user_profile = self.api.get_user(user_id)
+        except:
+            return None
+        return user_profile
 
-                    # increment the tf in the appropriate vector
-                    self.term_freq[line][token] += 1.0
-                    if (self.freq_docs[token].count(line) < 1):
-                        self.inverted_doc_freq[token] += 1.0
-                    else: # add the newest query to the list for that term
-                        self.freq_docs[token].append(line)
+    def crawl_user_tweets(self, user_id, the_count, total_tweets, attempts, since):
+        self.check_api_rate_limit(900)
+        try:
+                tweets = self.api.user_timeline(user_id, count = the_count)
+                # tweets = self.api.user_timeline(user_id, count = the_count, since_id = since)
+                # tweets = self.api.user_timeline(user_id, count = the_count, since_id = since, exclude_replies = 'true', include_rts = 'false')
+        except:
+            tweets = None
 
-                # make each tf vector into log-based version
-                for key in self.term_freq[line].keys():
-                    if self.term_freq[line][key] > 0:
-                        self.term_freq[line][key] = 1.0 + math.log(self.term_freq[line][key], 2)
+        if (len(tweets) < 1):
+            return []
+        tried_count = 0
+        temp_max = [0 for x in range(3)]
+        temp_max.append(tweets[len(tweets)-1]['id'])
+        newest = tweets[0]['id']
+        while len(tweets) < total_tweets:
+            try:
+                temp_max[0:1] = []
+                temp_max.append(temp_max[2])
+                for idx, tweet in enumerate(tweets):
+                    if (tweet['id'] == since):
+                         return (tweets[:idx], temp_max[3], newest)
+                    if (temp_max[3] > tweet['id']):
+                        temp_max[3] = tweet['id']
 
-            self.probabilities[no] = self.inverted_doc_freq.copy()
+                print temp_max[3]
+                if (temp_max[0] == temp_max[3]):
+                    return (tweets, temp_max[3], newest)
 
-            for term in self.inverted_doc_freq.keys():
-                self.probabilities[no][term] /= len(self.training_data[no])
-                if (self.inverted_doc_freq[term] != 0):
-                    self.inverted_doc_freq[term] = math.log((len(self.training_data[no]) / self.inverted_doc_freq[term]), 2)
-            # print 'The idf for ' + term + ' is ' + str(self.inverted_doc_freq[term]) + '.'
-
-            for tweet in self.term_freq.keys():
-                for trm in self.term_freq[tweet].keys():
-                    self.tf_idf[tweet][trm] = self.term_freq[tweet][trm] * self.inverted_doc_freq[trm]
-
-            # now re-initialize stuff for the next round
-            self.term_freq = {}
-            self.inverted_doc_freq = {}
-            self.tf_idf = {}
-            self.freq_docs = {}
-
-        print str(len(self.word_list)) + ' unique terms'
-        # now start the Naive Bayes
-
-        '''
-        for city in inFiles:
-            # for each token/term in that document
-            for tkn in self.term_freq[x].keys():
-		# print tkn + ' = ' +  str(self.houston_probabilities[tkn]) + ' / ' + str(self.dallas_probabilities[tkn])
-                if (self.houston_probabilities[tkn] != 0):
-                    houston_probability *= self.houston_probabilities[tkn]
-                if (self.dallas_probabilities[tkn] != 0):
-                    dallas_probability *= self.dallas_probabilities[tkn]
-
-            if (houston_probability > dallas_probability):
-                houston_list.append(x)
-            self.fdWrite.append(open(outf, 'w'))
-        '''
+                tweets.extend(self.api.user_timeline(user_id, count = the_count, max_id = temp_max[3]-1))
+                # tweets.extend(self.api.user_timeline(user_id, count = the_count, since_id = since))
+                # tweets.extend(self.api.user_timeline(user_id, count = the_count, since_id = temp_max[3], exclude_replies = 'true', include_rts = 'false'))
+            except:
+                pass
+            tried_count += 1
+            if tried_count == attempts:
+                break
+        return (tweets, temp_max[3], newest)
 
 def main():
-        nb = Naive_Bayes()
-        nb.DoNB()
+    tc = TwitterCrawler()
+    # API.user_timeline() takes either id or user_id or screen_name
+    filenames = ['dallas_tweets.txt', 'fort_worth_tweets.txt', 'houston_tweets.txt', 'austin_tweets.txt', 'san_antonio_tweets.txt', 'el_paso_tweets.txt']
+
+    files = []
+    since_ids = []
+    for filename in filenames:
+        temp_file = open(filename, 'r')
+        for line in temp_file:
+            if '--**--**--' in line:
+                idx = line.find(',')
+                idx2 = line.find('--**--**--') - 1
+                since_ids.append(line[11:idx] + ' ' + line[idx+13:idx2])
+        temp_file.close()
+        files.append(open(filename, 'a'))
+
+    # Dallas (index 0)
+    # @DallasNews 28,319
+    # @dallasnews_com 43,775
+
+    # Fort Worth (index 1)
+    # @FtWorthNews 67,497
+    # @News_FortWorth 32,639
+    # @News_Fort_Worth 18,510
+    # @TotalTrafficDFW 47,274 (TRAFFIC)
+    # @SDaviesNBC5 7,959 (TRAFFIC)
+
+    # Houston (index 2)
+    # @abc13houston 69,847
+    # @MyFoxHouston 67,440
+    # @News_Houston_TX 51,821
+    # @HoustonChron 63,620
+    # @KHOU 56,241
+    # @Houston_Traffic 1,857 (TRAFFIC)
+    # @HoustonTraffic 48,928 (TRAFFIC)
+
+    # Austin (index 3)
+    # @foxaustin 19,766
+    # @KVUE 40,178
+    # @KXAN_News 28,274
+    # @YNNAustin 37,518 (KINDA TRAFFIC?)
+
+    # San Antonio (index 4)
+    # @ksatnews 56,691
+    # @News4SA 45,245
+    # @TotalTrafficSAT 11,971 (TRAFFIC)
+    # @mySA 39,033
+    # @KENS5 28,887
+
+    # El-Paso (index 5)
+    # @elpasotimes 35,047
+    # @NewsElPasoTX 43,788
+    # @ElPaso__News 15,238
+    # @NC9 12,602
+
+    # the format is: twitter ID or screen name, which file index to write to, since id, then 0
+    tweeters = [['DallasNews', 0, 0, 0], ['FtWorthNews', 1, 0, 0], ['abc13houston', 2, 0, 0], ['foxaustin', 3, 0, 0], ['ksatnews', 4, 0, 0], ['elpasotimes', 5, 0, 0], ['dallasnews_com', 0, 0, 0], ['News_FortWorth', 1, 0, 0], ['MyFoxHouston', 2, 0, 0], ['KVUE', 3, 0, 0], ['News4SA', 4, 0, 0], ['NewsElPasoTX', 5, 0, 0], ['TotalTrafficDFW', 0, 0, 0], ['News_Fort_Worth', 1, 0, 0], ['HoustonTraffic', 2, 0, 0], ['YNNAustin', 3, 0, 0], ['KENS5', 4, 0, 0], ['ElPaso__News', 5, 0, 0], ['SDaviesNBC5', 1, 0, 0], ['News_Houston_TX', 2, 0, 0], ['HoustonChron', 2, 0, 0], ['KHOU', 2, 0, 0], ['KXAN_News', 3, 0, 0], ['TotalTrafficSAT', 4, 0, 0], ['mySA', 4, 0, 0], ['NC9', 5, 0, 0]]
+    for s in since_ids:
+        pair = s.split()
+        for i, tweeter in enumerate(tweeters):
+            if (pair[0] == tweeter[0]):
+                tweeters[i][2] = pair[1]
+
+    print tweeters
+    # flags to tell whether all tweets were pulled from each individual tweeter
+    complete = [0 for x in range(len(tweeters)+1)]
+    last = len(complete)-1
+
+    while (complete[last] == 0):
+        for index, tweeter in enumerate(tweeters):
+            tc.check_api_rate_limit(900)
+            user = tc.crawl_user_profile(tweeter[0])
+            print user['screen_name'] + ' has ' + str(user['statuses_count']) + ' tweets.'
+
+            tweets = tc.crawl_user_tweets(tweeter[0], 800, (user['statuses_count']-tweeter[3]), int(math.ceil(user['statuses_count']/200.0)), tweeter[2])
+            if (len(tweets) == 0):
+                continue
+            print 'retreived ' + str(len(tweets[0])) + ' of those tweets.\n'
+            # update that tweeter's total tweets pulled
+            tweeters[index][3] += len(tweets[0])
+            # update that tweeter's since tweet ID
+            tweeters[index][2] = tweets[1]
+            # if (tweeters[index][3] > 3200):
+                # complete[index] = 1
+
+            for tweet in tweets[0]:
+                temp = tweet['text'].encode('utf-8')
+                temp = (temp.lower()).strip(' \t\n\r')
+                temp = (temp.replace('\n',' ')).replace('\r',' ')
+                temp = (temp.replace('\'',' ')).replace('\"',' ')
+                temp = (temp.replace('\t',' ')).replace('-',' ')
+                temp = (temp.replace('[',' ')).replace(']',' ')
+                temp = (temp.replace('ó','o')).replace('í','i')
+                temp = (temp.replace('é','e')).replace('ñ','n')
+                temp = (temp.replace('á','a')).replace('â','a')
+                temp = (temp.replace('Á','a')).replace('à','a')
+                temp = (temp.replace('ç','c')).replace('¡','i')
+                temp = (temp.replace('ë','e')).replace('è','e')
+                temp = temp.replace('ú','u')
+                pat = re.compile('(…|°|“|”|’|′|‘|″|`|´|–|½| |😱|😶|☺️|😘|❤️|😊|✈️|©|😏|☁️|⚡️|☔️|♥|®|😁|😄|•|—|º|™|▸|😆|¿|›|❄|▪|�|😋||¢|😜|◆|😎|😞|😢|😔|😂|★|☆)')
+                temp = pat.sub('', temp)
+                this_doc = (temp.replace('?',' ')).replace('!',' ')
+                temp = str(tweet['created_at']).replace('+0000 ', '')
+                files[tweeter[1]].write(temp + ' ' + this_doc + '\n')
+            files[tweeter[1]].write('--**--**-- ' + tweeter[0] + ', since ID = ' + str(tweets[2]) + ' --**--**--\n')
+
+        complete[last] = 1
+        '''
+        for idx in range(last):
+            if (complete[idx] == 0):
+                complete[last] = 0
+                break
+        time.sleep(3600)
+        '''
+
+    for f in files:
+        f.close()
 
 if __name__ == "__main__":
-        main()
+    main()
