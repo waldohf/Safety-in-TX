@@ -1,0 +1,119 @@
+{% load staticfiles %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Safety in Texas</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'safetexas/css/bootstrap.css' %}" rel="stylesheet">
+
+    <!-- Add custom CSS here -->
+    <link href="{% static 'safetexas/css/business-frontpage.css' %}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Safety in Texas</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="city/austin">Austin</a></li>
+            <li><a href="city/houston">Houston</a></li>
+            <li><a href="city/dallas">Dallas</a></li>
+            <li><a href="city/fort_worth">Fort Worth</a></li>
+            <li><a href="city/san_antonio">San Antonio</a></li>
+            <li><a href="city/el_paso">El Paso</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container -->
+    </nav>
+    
+    <hr>
+    
+    <div class="container">
+    
+    
+<blockquote>
+  <p><b>Howdy!</b> Safety in Texas is a website built to display safety related Twitter data from the major cities in Texas. Our backend periodically crawls Twitter and uses Naive Bayes to classify the data. Our frontend is built off of the Django 1.6 web framework. We have collected approximately 120,000 Tweets and counting. Feel free to have a look around!</p>
+  <small>Team Our Best Friend Doug (Zach Habersang, Daryl Schmitt, Doug Cady)</small>
+</blockquote>
+
+      <div class="row">
+        <div class="col-sm-4">
+	    <a href ="city/austin">
+	    <center><img class="img-circle img-responsive text-center" src="http://www.evolvernetwork.org/wp-content/uploads/2012/07/austin.jpg"></center>
+            </a>
+            <h2 align="center">Austin</h2>
+        </div>
+        <div class="col-sm-4">
+	    <a href ="city/houston">
+	    <center><img class="img-circle img-responsive" src="http://www.otsbuscharter.com/images/city-pics/houston.jpg"></center>
+            </a>
+            <h2 align="center">Houston</h2>
+        </div>
+        <div class="col-sm-4">
+	    <a href ="city/dallas">
+	    <center><img class="img-circle img-responsive" src="http://www.burntorangereport.com/upload/dallas.jpg"></center>
+            </a>
+            <h2 align="center">Dallas</h2>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-sm-4">
+	    <a href ="city/fort_worth">
+	    <center><img class="img-circle img-responsive text-center" src="http://cowgirlintraining.files.wordpress.com/2012/02/downtown.jpg"></center>
+            </a>
+            <h2 align="center">Fort Worth</h2>
+        </div>
+        <div class="col-sm-4">
+	    <a href ="city/san_antonio">
+	    <center><img class="img-circle img-responsive" src="http://a1.cdn-hotels.com/images/themedcontent/en_GB/San%20Antonio_Neighbourhoods.jpg"></center>
+            </a>
+            <h2 align="center">San Antonio</h2>
+        </div>
+        <div class="col-sm-4">
+	    <a href ="city/el_paso">		
+	    <center><img class="img-circle img-responsive" src="http://makeuponlinetraining.com/wp-content/uploads/2012/10/el-paso3.jpg"></center>
+            </a>
+            <h2 align="center">El Paso</h2>
+        </div>
+      </div>
+     
+      <hr>
+
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p>Copyright &copy; Team Our Best Friend Doug 2013</p>
+          </div>
+        </div>
+      </footer>
+
+    </div> <!-- /container -->
+
+
+    <!-- JavaScript -->
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.js"></script>
+
+  </body>
+</html>

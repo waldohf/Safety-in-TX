@@ -1,0 +1,130 @@
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dallas</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'safetexas/css/bootstrap.css' %}" rel="stylesheet">
+    <!-- Add custom CSS here -->
+    <link href="{% static 'safetexas/css/one-page-wonder.css' %}" rel="stylesheet">
+    
+
+    
+  </head>
+
+  <body>
+  
+    
+    {% include 'safetexas/chart.html' %}
+	    
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.php">Dallas</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#about">Crime - General</a></li>
+            <li><a href="#services">Crime - Homicide</a></li>
+            <li><a href="#contact">Crime - Sexual</a></li>
+            <li><a href="#contact">Crime - Drugs</a></li>
+            <li><a href="#contact">Crime - Finance</a></li>
+            <li><a href="#contact">Crime - General</a></li>
+            <li><a href="#contact">Accident</a></li>
+            <li><a href="#contact">Disaster</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container -->
+    </nav>
+
+    <div class="header-image">
+
+      <div class="headline">
+        <div class="container">
+          <h1>Dallas</h1>
+          <h2>Live Safety Report</h2>
+        </div>
+      </div>
+
+    </div><!-- /header-image -->
+
+    <div class="container">
+    
+    <br /><br />
+    
+    <form align="center" role="form" class="form-inline" method="post" action=".">
+        {% bootstrap_form form layout='inline' %}
+        {% buttons submit='GENERATE LIVE REPORT' layout='inline' %}{% endbuttons %}
+    </form>
+
+      <!-- START THE FEATURETTES -->
+
+      <hr class="featurette-divider">
+
+      <div class="featurette" id="about">      
+        <h2 class="featurette-heading">Crime in Dallas :: <span class="text-muted">Homicides</span></h2>
+        <p class="lead">Here we will report recent tweets about homicide crimes in Dallas. You will be able to view the most recent homicide tweets and see statistics about homicides in Dallas.</p>
+        {% include 'safetexas/pagination.html' %}
+      </div>
+
+      <hr class="featurette-divider">
+
+      <div class="featurette" id="services">
+        <h2 class="featurette-heading">Crime Statistics ::<span class="text-muted"> Graphs</span></h2>
+        <p class="lead">Here you will be able to see trends in crime related statistics for Dallas. </p>
+        <div id="series_count" class="wide graph"></div>
+      </div>
+
+      <hr class="featurette-divider">
+
+      <div class="featurette" id="contact">
+        <h2 class="featurette-heading">Crime Statistics ::<span class="text-muted"> Charts</span></h2>
+        <p class="lead">The following pie charts will compare percentages of crimes in the Dallas area.</p>
+
+      </div>
+      
+      
+      <hr class="featurette-divider">
+
+      <div class="featurette" id="contact">
+        <img class="featurette-image img-circle img-responsive pull-right" src="http://www.surrealtyhomes.com/images/Dallas-skyline.jpg" width="500" height="500">
+        <h2 class="featurette-heading">Crime Conclusions :: <span class="text-muted"> Comparisons</span></h2>
+        <p class="lead">Here we will compare Dallas crime versus crime of other cities.</p>
+      </div>
+
+
+      <!-- /END THE FEATURETTES -->
+
+      <hr>
+
+      <!-- FOOTER -->
+      <footer>
+        <p>Copyright &copy; Company 2013</p>
+      </footer>
+      <!-- /END OF FOOTER -->
+
+    </div><!-- /container -->
+
+    <!-- JavaScript -->
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.js"></script>
+
+  </body>
+
+</html>

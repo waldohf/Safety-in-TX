@@ -1,0 +1,15 @@
+{% extends 'safetexas/base.html' %}
+{% load staticfiles %}
+
+{% block title %}<h2>Safety in Texas</h2>{% endblock %}
+
+{% block content %}
+
+    {% include 'safetexas/chart.html' %}
+	    <h1>Charts</h1>
+	    <div id="series_count" class="wide graph"></div>
+	    <div id="out"></div>
+    {% include 'safetexas/pagination.html' %}
+    {% include 'safetexas/pagination.html' %} 
+{% endblock %}
+

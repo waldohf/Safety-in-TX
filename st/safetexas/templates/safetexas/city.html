@@ -1,0 +1,328 @@
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{ title }}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'safetexas/css/bootstrap.css' %}" rel="stylesheet">
+    <!-- Add custom CSS here -->
+    <link href="{% static 'safetexas/css/one-page-wonder.css' %}" rel="stylesheet">
+    
+    <style>
+	.header-image {
+		background: url({{ bg }}) repeat;/* Use a tiling background image or a full width image - if you're using full width you will need to change no-repeat center center cover  */
+		background-position: top;
+		height: auto;
+		display: block;
+		width: 100%;
+		text-align: center;
+	} 
+    </style>
+    
+  </head>
+
+  <body>
+    {% include 'safetexas/chart.html' %}
+	    
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Safety in Texas ({{ title }})</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#crimes">Crime</a></li>
+            <li><a href="#disasters">Disasters</a></li>
+            <li><a href="#accidents">Accidents</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container -->
+    </nav>
+
+    <div class="header-image">
+
+      <div class="headline">
+        <div class="container">
+          <h1>{{ title }}</h1>
+          <h2>Safety in Texas</h2>
+        </div>
+      </div>
+
+    </div><!-- /header-image -->
+
+    <div class="container">
+    
+    
+      <div class="featurette" id="overall">      
+        <h2 class="featurette-heading">Overall<span class="text-muted"> {{ totals }} Total</span></h2>
+        <p class="lead">Safety in Texas classifies Tweets into three general categories: crimes, accident, and disaster.</p>
+
+        <div class="row">
+	    <div class="col-md-6">
+		<div align="left" id="out2"></div>
+	    </div>
+    
+	    <div class="col-md-6"> 
+		
+	    </div>
+	</div>
+      </div>
+    
+
+   
+      <div class="featurette" id="crimes">      
+        <h2 class="featurette-heading">Crimes<span class="text-muted"> {{ city.crimes.total }} Total</span></h2>
+        <p class="lead">The crimes category is split up into five different subclasses: homicide, sex, financial, drugs, and general. The general crime category are crimes that do not belong to specific category</p>
+
+        <div class="row">
+	    <div class="col-md-6">
+		<div align="left" id="out1"></div>
+	    </div>
+    
+	    <div class="col-md-6"> 
+		
+		<h2>Crime Tweets within the last...</h2>
+		<table class="table">
+		    <tr><td><b>Day..</b>	</td><td> 	{{ city.crimes.last_day }}</td></tr>
+		    <tr><td><b>Week..</b>	</td><td> 	{{ city.crimes.last_week }}</td></tr>
+		    <tr><td><b>Month..</b>	</td><td> 	{{ city.crimes.last_month }}</td></tr>
+		    <tr><td><b>3 Months..</b>	</td><td> 	{{ city.crimes.last_three }}</td></tr>
+		    <tr><td><b>6 Months..</b>	</td><td> 	{{ city.crimes.last_six }}</td></tr>
+		    <tr><td><b>Year..</b>	</td><td> 	{{ city.crimes.last_year }}</td></tr>
+		</table>
+	
+	    </div>
+	</div>
+	
+        <div class="row">
+	    <div class="col-md-6">
+		
+		<a href="/tweets/{{ city_name }}/crime_homicide">
+		<h2>Latest Homicide Tweets...</h2>
+		</a>
+		In the last... 
+		<b>Day</b> {{ city.crime_homicide.last_day }}
+		<b>Week</b> {{ city.crime_homicide.last_week }}
+		<b>Month</b> {{ city.crime_homicide.last_month }}
+		<b>3 Months</b> {{ city.crime_homicide.last_three }}
+		<b>6 Months</b> {{ city.crime_homicide.last_six }}
+		<b>Year</b> {{ city.crime_homicide.last_year }}
+		<br /><br />
+		
+		<table class="table table-striped">
+		    {% for tweet in city.crime_homicide.recent %}
+		    <tr>
+			<td>
+			    <b>{{ tweet.date }}</b>   {{ tweet.text }}
+			</td>
+		    </tr>
+		    {% endfor %}
+		</table>	    
+	    
+	    </div>
+    
+	    <div class="col-md-6"> 
+		
+		<a href="/tweets/{{ city_name }}/crime_sex">
+		<h2>Latest Sex Crime Tweets...</h2>
+		</a>
+		In the last... 
+		<b>Day</b> {{ city.crime_sex.last_day }}
+		<b>Week</b> {{ city.crime_sex.last_week }}
+		<b>Month</b> {{ city.crime_sex.last_month }}
+		<b>3 Months</b> {{ city.crime_sex.last_three }}
+		<b>6 Months</b> {{ city.crime_sex.last_six }}
+		<b>Year</b> {{ city.crime_sex.last_year }}
+		<br /><br />
+		
+		<table class="table table-striped">
+		    {% for tweet in city.crime_sex.recent %}
+		    <tr>
+			<td>
+			    <b>{{ tweet.date }}</b>   {{ tweet.text }}
+			</td>
+		    </tr>
+		    {% endfor %}
+		</table>
+	
+	    </div>
+	</div>
+	
+        <div class="row">
+	    <div class="col-md-6">
+
+		<a href="/tweets/{{ city_name }}/crime_finance">
+		<h2>Latest Financial Crime Tweets...</h2>
+		</a>
+		
+		In the last... 
+		<b>Day</b> {{ city.crime_finance.last_day }}
+		<b>Week</b> {{ city.crime_finance.last_week }}
+		<b>Month</b> {{ city.crime_finance.last_month }}
+		<b>3 Months</b> {{ city.crime_finance.last_three }}
+		<b>6 Months</b> {{ city.crime_finance.last_six }}
+		<b>Year</b> {{ city.crime_finance.last_year }}
+		<br /><br />
+		
+		<table class="table table-striped">
+		    {% for tweet in city.crime_finance.recent %}
+		    <tr>
+			<td>
+			    <b>{{ tweet.date }}</b>   {{ tweet.text }}
+			</td>
+		    </tr>
+		    {% endfor %}
+		</table>	    
+	    
+	    </div>
+    
+	    <div class="col-md-6"> 
+		
+		<a href="/tweets/{{ city_name }}/crime_drugs">
+		<h2>Latest Drug Crime Tweets...</h2>
+		</a>
+		
+		In the last... 
+		<b>Day</b> {{ city.crime_drugs.last_day }}
+		<b>Week</b> {{ city.crime_drugs.last_week }}
+		<b>Month</b> {{ city.crime_drugs.last_month }}
+		<b>3 Months</b> {{ city.crime_drugs.last_three }}
+		<b>6 Months</b> {{ city.crime_drugs.last_six }}
+		<b>Year</b> {{ city.crime_drugs.last_year }}
+		<br /><br />
+		
+		<table class="table table-striped">
+		    {% for tweet in city.crime_drugs.recent %}
+		    <tr>
+			<td>
+			    <b>{{ tweet.date }}</b>   {{ tweet.text }}
+			</td>
+		    </tr>
+		    {% endfor %}
+		</table>
+	
+	    </div>
+	</div>
+	
+      </div>
+
+      
+
+      <div class="featurette" id="disasters">
+        <h2 class="featurette-heading">Disasters<span class="text-muted"> {{ city.disaster.total }} Total</span></h2>
+        <p class="lead">The disasters category includes tweets about weather related incidents, natural disasters, and human related disasters such as gas leaks. </p>
+		
+        <div class="row">
+	    <div class="col-md-6">
+
+		<h2>Disaster Tweets within the last...</h2>
+		
+		<table class="table">
+		    <tr><td><b>Day..</b>	</td><td> 	{{ city.disaster.last_day }}</td></tr>
+		    <tr><td><b>Week..</b>	</td><td> 	{{ city.disaster.last_week }}</td></tr>
+		    <tr><td><b>Month..</b>	</td><td> 	{{ city.disaster.last_month }}</td></tr>
+		    <tr><td><b>3 Months..</b>	</td><td> 	{{ city.disaster.last_three }}</td></tr>
+		    <tr><td><b>6 Months..</b>	</td><td> 	{{ city.disaster.last_six }}</td></tr>
+		    <tr><td><b>Year..</b>	</td><td> 	{{ city.disaster.last_year }}</td></tr>
+		</table>	    
+	    
+	    </div>
+    
+	    <div class="col-md-6"> 
+		
+		<a href="/tweets/{{ city_name }}/disaster">
+		<h2>Latest Disaster Tweets...</h2>
+		</a>
+		
+		<table class="table table-striped">
+		    {% for tweet in city.disaster.recent %}
+		    <tr>
+			<td>
+			    <b>{{ tweet.date }}</b>   {{ tweet.text }}
+			</td>
+		    </tr>
+		    {% endfor %}
+		</table>
+	
+	    </div>
+	</div>
+      </div>
+      
+      
+
+      <div class="featurette" id="accidents">
+        <h2 class="featurette-heading">Accidents<span class="text-muted"> {{ city.accident.total }} Total</span></h2>
+        <p class="lead">The accidents category includes traffic accidents and other various accident related tweets.</p>
+        
+        <div class="row">
+	    <div class="col-md-6">
+	    
+		<a href="/tweets/{{ city_name }}/accident">
+		<h2>Latest Accident Tweets...</h2>
+		</a>
+		
+		<table class="table table-striped">
+		    {% for tweet in city.accident.recent %}
+		    <tr>
+			<td>
+			    <b>{{ tweet.date }}</b>   {{ tweet.text }}
+			</td>
+		    </tr>
+		    {% endfor %}
+		</table>
+	    
+	    </div>
+    
+	    <div class="col-md-6"> 
+	
+		<h2>Accident Tweets within the last...</h2>
+		<table class="table">
+		    <tr><td><b>Day..</b>	</td><td> 	{{ city.accident.last_day }}</td></tr>
+		    <tr><td><b>Week..</b>	</td><td> 	{{ city.accident.last_week }}</td></tr>
+		    <tr><td><b>Month..</b>	</td><td> 	{{ city.accident.last_month }}</td></tr>
+		    <tr><td><b>3 Months..</b>	</td><td> 	{{ city.accident.last_three }}</td></tr>
+		    <tr><td><b>6 Months..</b>	</td><td> 	{{ city.accident.last_six }}</td></tr>
+		    <tr><td><b>Year..</b>	</td><td> 	{{ city.accident.last_year }}</td></tr>
+		</table>
+	
+	    </div>
+	</div>
+      </div>
+      
+     
+      <hr>
+
+      <!-- FOOTER -->
+      <footer>
+        <p>Copyright &copy; Team Our Best Friend Doug 2013</p>
+      </footer>
+      <!-- /END OF FOOTER -->
+
+    </div><!-- /container -->
+
+    <!-- JavaScript -->
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.js"></script>
+
+  </body>
+
+</html>
+

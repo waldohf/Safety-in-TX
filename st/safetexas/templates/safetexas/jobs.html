@@ -1,0 +1,29 @@
+{% extends 'safetexas/bootstrap.html' %}
+
+{% load bootstrap3 %}
+
+{% block bootstrap3_content %}
+<div class="container">
+
+<h1>
+{% block title %}({{ num_it_jobs }}) IT Job Postings at Texas A&amp;M [{{ num_jobs }} Total]{% endblock %}
+</h1>
+
+<br />
+
+{% block content %}
+
+{% for key, job in jobs.items %}
+    {% if job.bookmark %}
+	<font size="4"><b>{{ job.date }}</b> ---- <a href="{{ job.link }}">{{ job.title }}</a></font>
+	<hr />
+    {% endif %}
+{% endfor %}
+
+<hr />
+Python Script by Zachary Habersang
+
+{% endblock %}
+
+</div>
+{% endblock %}

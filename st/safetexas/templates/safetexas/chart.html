@@ -1,0 +1,38 @@
+	{% load googlecharts %}
+
+	{% googlecharts %}
+		
+		{# named data and options can be reused #}
+		{% data crimes "out_data_crime" %}
+		    {% col "string" "Name" %}"{{ val }}"{% endcol %}
+		    {% col "number" "Value" %}{{ val }}{% endcol %}
+		{% enddata %}
+		
+		{% data classes "out_data_class" %}
+		    {% col "string" "Name" %}"{{ val }}"{% endcol %}
+		    {% col "number" "Value" %}{{ val }}{% endcol %}
+		{% enddata %}
+		
+		{# you can also use global javascript variables here, #}
+		{# and call functions #}
+		{% options "out_options_crime" %}
+		    kind: "PieChart",
+		    options: {
+			width: 800,
+			height: 400
+		    }
+		{% endoptions %}
+
+		{% options "out_options_class" %}
+		    kind: "PieChart",
+		    options: {
+			width: 1000,
+			height: 500
+		    }
+		{% endoptions %}
+		{# chart is assembled from container, data and options #}
+
+		{% graph "out1" "out_data_crime" "out_options_crime" %}
+		{% graph "out2" "out_data_class" "out_options_class" %}
+	{% endgooglecharts %}
+
